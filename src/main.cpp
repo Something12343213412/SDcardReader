@@ -17,12 +17,18 @@ vex::brain       Brain;
 
 
 int main() {
+    // Add more text and display file size
+    if (Brain.SDcard.exists("Text.txt")) {
+    // Get the size of the file
+    int fileSize = Brain.SDcard.size("Text.txt");
 
-    Brain.Screen.printAt( 10, 50, "Hello V5" );
-   
-    while(1) {
-        
-        // Allow other tasks to run
-        this_thread::sleep_for(10);
+    // Make a buffer to hold the file data
+    uint8_t buffer[fileSize];
+
+    // Load the file from the SD card into the buffer
+    Brain.SDcard.loadfile("Text.txt", buffer, sizeof(buffer));
+
+    // Display the file contents on the screen
+    Brain.Screen.print("%s", buffer);
     }
 }
