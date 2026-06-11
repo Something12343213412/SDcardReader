@@ -11,6 +11,7 @@
 #include <string>
 
 #include<sstream>
+// stolen from somewhere on stack overflow
 template <typename T>
 std::string to_string(T value)
 {
@@ -32,6 +33,7 @@ vex::brain       Brain;
 // define your global instances of motors and other devices here
 controller Controller1;
 
+// stole this code from the vex site I think
 void printFile(char* file = "Text.txt"){
 if (Brain.SDcard.exists(file)) {
         // Get the size of the file
@@ -44,7 +46,6 @@ if (Brain.SDcard.exists(file)) {
         // Load the file from the SD card into the buffer
         Brain.SDcard.loadfile(file, buffer, sizeof(buffer));
 
-        char* data = reinterpret_cast<char*>(buffer);
         Brain.Screen.print("%s", buffer);
         Brain.Screen.newLine();
     
@@ -84,10 +85,9 @@ void logData(char* file){
         buffer[fileSize] = '\0'; // adding end code
 
         Brain.SDcard.loadfile(file, buffer, sizeof(buffer)); // actually load file
-        char* data = reinterpret_cast<char*>(buffer); // probably not needed
-        printf("%s", "\n \n AXIS 1 \n");
+        printf("\n %s \n", file);
         printf("%s", buffer);
-        printf("%s", "\n"); // make sure the previous is outputted
+        printf("\n"); // make sure the previous is outputted
     }
     else{
         printf("%s Doesn't exist", file);
@@ -95,9 +95,10 @@ void logData(char* file){
 }
 
 void logAll(){
-    char* files[] = {"Axis1.txt", "Axis2.txt", "Axis3.txt", "Axis4.txt"};
-    for(int i = 0; i < sizeof(files); i++){
-        logData(files[i]); // log all files in list
+    char files[][10] = {"Axis1.txt", "Axis2.txt", "Axis3.txt", "Axis4.txt", "BtnUp.txt"};
+    // we take total number of bytes then /10 as each thing has 10 bytes to get total size
+    for(int i = 0; i < sizeof(files)/10; i++){
+        logData(files[i]);
     }
 }
 
@@ -118,6 +119,11 @@ void writeAxis4(){
     writeData("Axis4.txt", Controller1.Axis4.position(percent), Brain.timer(msec));
 }
 
+void writeButtonUp(){
+    // since size of the file matters that is why there is weird naming scheme, could make better system but idc
+    writeData("BtnUp.txt", Controller1.ButtonUp.pressing(), Brain.timer(msec));
+}
+
 int main() {
     uint8_t empty[0];
 
@@ -125,6 +131,7 @@ int main() {
     Brain.SDcard.savefile("Axis2.txt", empty, 0);
     Brain.SDcard.savefile("Axis3.txt", empty, 0);
     Brain.SDcard.savefile("Axis4.txt", empty, 0);
+    Brain.SDcard.savefile("BtnUp.txt", empty, 0);
 
     
     
@@ -132,6 +139,8 @@ int main() {
     Controller1.Axis2.changed(writeAxis2);
     Controller1.Axis3.changed(writeAxis3);
     Controller1.Axis4.changed(writeAxis4);
+    Controller1.ButtonUp.pressed(writeButtonUp);
+    Controller1.ButtonUp.released(writeButtonUp);
 
 
 
