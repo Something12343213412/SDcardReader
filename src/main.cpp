@@ -127,11 +127,12 @@ void writeButtonUp(){
 int main() {
     uint8_t empty[0];
 
-    Brain.SDcard.savefile("Axis1.txt", empty, 0);
-    Brain.SDcard.savefile("Axis2.txt", empty, 0);
-    Brain.SDcard.savefile("Axis3.txt", empty, 0);
-    Brain.SDcard.savefile("Axis4.txt", empty, 0);
-    Brain.SDcard.savefile("BtnUp.txt", empty, 0);
+    // list of files, make sure they line up with the list in log all
+    char files[][10] = {"Axis1.txt", "Axis2.txt", "Axis3.txt", "Axis4.txt", "BtnUp.txt"};
+
+    for(int i = 0; i < sizeof(files)/10; i++){
+        Brain.SDcard.savefile(files[i], empty, 0); // empty out all files
+    }
 
     
     
