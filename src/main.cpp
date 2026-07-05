@@ -7,6 +7,8 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "write.h"
+#include <vector>
+#include <algorithm>
 
 
 // list of files, make sure they line up with the list in log all
@@ -115,8 +117,7 @@ void logAll(){
     }
 }
 
-
-int main() {
+void writeMode(){
     uint8_t empty[0];
 
     for(int i = 0; i < sizeof(files)/10; i++){
@@ -132,7 +133,74 @@ int main() {
         printInputs(inputs);
         wait(10, msec);
     }
+}
 
+//returns pointer of readfile, make sure to make a copy of the pointer as this data is probably going to be deleted
+void readFile(uint8_t* buffer, char* file){
+    int fileSize = Brain.SDcard.size(file);
+
+    buffer = new uint8_t[fileSize+1];
+    buffer[fileSize] = '\0'; // adding end code
+
+    Brain.SDcard.loadfile(file, buffer, sizeof(buffer));
+}
+
+// holds a time value nad a power value, meant for what the brain will actually read
+struct Instruction{
+    int time;
+    short power;
+
+    Instruction(int time, short power){
+        this->time = time;
+        this->power = power;
+    }
+};
+
+
+//std::vector<Instruction>
+void convertStringToInstruction(char* string){
+    std::vector<Instruction> result;
+    char * pch;
+    int val1;
+    int val2;
+    pch = strtok (string,"|,");
+    while (pch != NULL)
+    {
+        val1 = atoi(pch);
+        pch = strtok (NULL, "|,");
+        val2 = atoi(pch);
+        // want to make sure not doing a null ptr
+        if(pch!=NULL)
+            pch = strtok (NULL, "|,");
+        
+        result.push_back(Instruction(val2, val1));   
+    }
+
+    std::reverse(result.begin(), result.end());
+
+    for (int i = result.size()-1; i >=0; i--){
+        printf("%d", result[i].power);
+        printf("%s", " | ");
+        printf("%d", result[i].time);
+        printf("\n");
+    }
+    //return result;
+}
+
+
+
+int main() {
+    //writeMode();
+
+    int fileSize = Brain.SDcard.size("Axis1.txt");
+    uint8_t buffer[fileSize+1];
+    buffer[fileSize] = '\0'; // adding end code
+
+    Brain.SDcard.loadfile("Axis1.txt", buffer, sizeof(buffer));
+    char* charPointer = (char*)buffer;
+    convertStringToInstruction(charPointer);
+
+    //printf("%s", buffer);
 }
 
 

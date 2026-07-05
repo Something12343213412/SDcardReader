@@ -4,11 +4,14 @@
 #include <string>
 #include <array>
 #include <sstream>
-#include "vex.h"
 #include "vexHardware.cpp"
+#include <sstream>
 
-using namespace vex;
 
+extern brain Brain;
+extern controller Controller1;
+
+// yoinked from someone else on stack overflow :)
 template <typename T>
 std::string to_string(T value);
 
