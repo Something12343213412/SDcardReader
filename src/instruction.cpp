@@ -1,10 +1,11 @@
 #include "instruction.h"
 
-Instruction::Instruction(int time, short power){
+Instruction::Instruction(int time, int power){
     this->time = time;
     this->power = power;
 }
 
+// takes in a vector pointer and a string, that string gets seperated and put into the vector
 void convertStringToInstruction(std::vector<Instruction>* result, char* string){
     // the code on c++ ref used pch so just kept it, no idea what it stands for
     char * pch;
@@ -30,3 +31,15 @@ void convertStringToInstruction(std::vector<Instruction>* result, char* string){
     // adds it in reverse (if we start by indexing the array with using .size) so reversing it ahead of time
     std::reverse(result->begin(), result->end());
 }
+
+void* ButtonInstruction::update(){
+
+}
+
+ButtonInstruction::ButtonInstruction(char* fileName, char* button, void* callback){
+    convertStringToInstruction(&instructions, fileName);
+    this->button = button;
+    this->callback = callback; 
+    updateButtons.push_back(this);
+}
+
