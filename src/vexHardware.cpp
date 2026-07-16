@@ -1,7 +1,4 @@
-#pragma once
-#include "vex.h"
+#include "vexHardware.h"
 
-using namespace vex;
-
-extern brain Brain;
-extern controller Controller1;
+brain Brain;
+controller Controller1;

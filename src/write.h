@@ -4,7 +4,7 @@
 #include <string>
 #include <array>
 #include <sstream>
-#include "vexHardware.cpp"
+#include "vexHardware.h"
 #include <sstream>
 
 

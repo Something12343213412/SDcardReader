@@ -143,16 +143,22 @@ void readFile(uint8_t* buffer, char* file){
 }
 
 
+void empty(){
+
+}
+
 int main() {
     //writeMode();
 
-    int fileSize = Brain.SDcard.size("Axis1.txt");
+    
+    int fileSize = Brain.SDcard.size("BtnBB.txt");
     uint8_t buffer[fileSize+1];
     buffer[fileSize] = '\0'; // adding end code
 
-    Brain.SDcard.loadfile("Axis1.txt", buffer, sizeof(buffer));
+    Brain.SDcard.loadfile("BtnBB.txt", buffer, sizeof(buffer));
     char* charPointer = (char*)buffer;
 
+    
     std::vector<Instruction> result;
     convertStringToInstruction(&result, charPointer);
 
@@ -164,6 +170,17 @@ int main() {
     }
 
     //printf("%s", buffer);
+    
+    
+    extern StateManager currentState;
+
+    Brain.resetTimer();
+    ButtonInstruction result2(charPointer, &currentState.A);
+    while (true){
+        result2.update(empty);
+    }
+        
+
 }
 
 

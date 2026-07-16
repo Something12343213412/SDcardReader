@@ -1,5 +1,8 @@
 #include "instruction.h"
 
+// contains a list of Button Instructions that will later be looped through and updates called
+std::vector<ButtonInstruction*> buttonInstructions;
+
 Instruction::Instruction(int time, int power){
     this->time = time;
     this->power = power;
@@ -29,17 +32,33 @@ void convertStringToInstruction(std::vector<Instruction>* result, char* string){
     }
     
     // adds it in reverse (if we start by indexing the array with using .size) so reversing it ahead of time
-    std::reverse(result->begin(), result->end());
+    //std::reverse(result->begin(), result->end()); Think this is unnescary
 }
 
-void* ButtonInstruction::update(){
+void ButtonInstruction::update(std::function<void ()>){
+    extern brain Brain;
+    // if facing preformance issues could just create a local copy of last index of instructions so much less calls have to be made
 
+    // checks if the current time is past or = to the time in instructions
+    if(Brain.timer(msec) >= this->instructions[this->instructions.size()-1].time){
+        // set the current state value to be the last thing instructions
+        *this->stateValue = (bool)this->instructions[this->instructions.size()-1].power;
+        
+        // debug statements, idk how to use printf, don't judge me
+        printf("Current state is %d", (bool)this->instructions[this->instructions.size()-1].power);
+        printf("\n Current time is %d", Brain.timer(msec));
+        printf("\n Instruction time was %d",this->instructions[this->instructions.size()-1].time);
+        printf("\n");
+
+        // delete the instruction that was just read
+        this->instructions.pop_back();
+    }
 }
 
-ButtonInstruction::ButtonInstruction(char* fileName, char* button, void* callback){
-    convertStringToInstruction(&instructions, fileName);
-    this->button = button;
-    this->callback = callback; 
-    updateButtons.push_back(this);
+ButtonInstruction::ButtonInstruction(char* charPointer, bool* stateValue){
+    extern std::vector<ButtonInstruction*> buttonInstructions;
+    this->stateValue = stateValue;
+    convertStringToInstruction(&instructions, charPointer);
+    buttonInstructions.push_back(this);   
 }
 

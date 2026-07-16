@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include "stateManager.h"
 
 extern brain Brain;
 
@@ -13,18 +14,21 @@ struct Instruction{
     int power;
 };
 
+
 // takes vector pointer and takes a string of data from a file and then puts all that data into the vector
 void convertStringToInstruction(std::vector<Instruction>* result, char* string);
 
 // holds the button instructions and the update function which is then put into a global array
 class ButtonInstruction{
-    std::vector<Instruction> instructions;
-    char* button;
-    void* callback;
-    void* update();
-    ButtonInstruction(char* fileName, char* button, void* callback);
+    public:
+        bool* stateValue;
+        // contains vectorized list of what this should do
+        std::vector<Instruction> instructions;
+        // updates the global state, if did pops instruction then runs callback
+        void update(std::function<void ()> callback);
+        // takes in a button and the data of a file and the state that it effects
+        ButtonInstruction(char* charPointer, bool* stateValue);
 };
 
-// contains a list of Button Instructions that will later be looped through and updates called
-std::vector<ButtonInstruction*> updateButtons;
+
 
