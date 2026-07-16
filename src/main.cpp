@@ -159,8 +159,9 @@ int main() {
     char* charPointer = (char*)buffer;
 
     
+    /*
     std::vector<Instruction> result;
-    convertStringToInstruction(&result, charPointer);
+    //convertStringToInstruction(&result, charPointer);
 
     for (int i = result.size()-1; i > -1; i--){
         printf("%d", result[i].power);
@@ -168,18 +169,18 @@ int main() {
         printf("%d", result[i].time);
         printf("\n");
     }
+    */
 
     //printf("%s", buffer);
     
     
     extern StateManager currentState;
-
-    Brain.resetTimer();
     ButtonInstruction result2(charPointer, &currentState.A);
+    result2.PrintInstruction();
+    Brain.resetTimer();
     while (true){
         result2.update(empty);
-    }
-        
+    }  
 
 }
 

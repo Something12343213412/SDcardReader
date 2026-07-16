@@ -28,6 +28,8 @@ class ButtonInstruction{
         void update(std::function<void ()> callback);
         // takes in a button and the data of a file and the state that it effects
         ButtonInstruction(char* charPointer, bool* stateValue);
+        // used for debugging
+        void PrintInstruction();
 };
 
 

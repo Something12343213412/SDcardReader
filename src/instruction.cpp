@@ -26,13 +26,19 @@ void convertStringToInstruction(std::vector<Instruction>* result, char* string){
         // want to make sure not doing a null ptr
         if(pch!=NULL)
             pch = strtok (NULL, "|,");
-        
-        // ad the values to a vector that houses the instructions
+
+        /*
+        // debug statements
+        printf("val 1 is %d", val1);
+        printf("\n val 2 is %d", val2);
+        printf("\n");
+        */
+        // add the values to a vector that houses the instructions
         result->push_back(Instruction(val2, val1));   
     }
     
     // adds it in reverse (if we start by indexing the array with using .size) so reversing it ahead of time
-    //std::reverse(result->begin(), result->end()); Think this is unnescary
+    std::reverse(result->begin(), result->end());
 }
 
 void ButtonInstruction::update(std::function<void ()>){
@@ -40,13 +46,13 @@ void ButtonInstruction::update(std::function<void ()>){
     // if facing preformance issues could just create a local copy of last index of instructions so much less calls have to be made
 
     // checks if the current time is past or = to the time in instructions
-    if(Brain.timer(msec) >= this->instructions[this->instructions.size()-1].time){
+    if((int)Brain.timer(msec) >= this->instructions[this->instructions.size()-1].time){
         // set the current state value to be the last thing instructions
         *this->stateValue = (bool)this->instructions[this->instructions.size()-1].power;
-        
+            
         // debug statements, idk how to use printf, don't judge me
         printf("Current state is %d", (bool)this->instructions[this->instructions.size()-1].power);
-        printf("\n Current time is %d", Brain.timer(msec));
+        printf("\n Current time is %f", Brain.timer(msec));
         printf("\n Instruction time was %d",this->instructions[this->instructions.size()-1].time);
         printf("\n");
 
@@ -58,7 +64,17 @@ void ButtonInstruction::update(std::function<void ()>){
 ButtonInstruction::ButtonInstruction(char* charPointer, bool* stateValue){
     extern std::vector<ButtonInstruction*> buttonInstructions;
     this->stateValue = stateValue;
-    convertStringToInstruction(&instructions, charPointer);
+    convertStringToInstruction(&this->instructions, charPointer);
+    // this is not an ideal solution at all and idk really know why it is needed but w/o it update just skips over last index
+    this->instructions.insert(this->instructions.begin(), Instruction(999999999,0));
     buttonInstructions.push_back(this);   
 }
 
+void ButtonInstruction::PrintInstruction(){
+    for (int i = this->instructions.size()-1; i > -1; i--){
+        printf("%d", this->instructions[i].power);
+        printf("%s", " | ");
+        printf("%d", this->instructions[i].time);
+        printf("\n");
+    }
+}
