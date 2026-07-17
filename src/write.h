@@ -7,6 +7,8 @@
 #include "vexHardware.h"
 #include <sstream>
 
+// allows to easily change what files are written too
+//char (*currentFileSet)[11];
 
 extern brain Brain;
 extern controller Controller1;

@@ -117,9 +117,10 @@ void logAll(){
 void writeMode(int time){
     Brain.resetTimer();
     uint8_t empty[0];
+    extern char (*currentFileSet)[11];
 
     for(int i = 0; i < sizeof(files)/10; i++){
-        Brain.SDcard.savefile(files[i], empty, 0); // empty out all files
+        Brain.SDcard.savefile(currentFileSet[i], empty, 0); // empty out all files
     }
 
     setWrites();
@@ -163,21 +164,51 @@ void buttonB(){
     else
         Brain.Screen.setFillColor("#5c5c5c");
 
-    Brain.Screen.drawCircle(30,100,30);
-    Brain.Screen.printAt(20,100, "B");
+    Brain.Screen.drawCircle(30,110,30);
+    Brain.Screen.printAt(20,110, "B");
+}
+
+void buttonX(){
+    extern StateManager currentState;
+    if (currentState.X)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+
+    Brain.Screen.drawCircle(70,40,30);
+    Brain.Screen.printAt(70,40, "X");
+}
+
+void buttonY(){
+    extern StateManager currentState;
+    if (currentState.Y)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+
+    Brain.Screen.drawCircle(70,110,30);
+    Brain.Screen.printAt(70,110, "Y");
 }
 
 
 int main() {
+
+    extern char (*currentFileSet)[11];
     //writeMode();
 
     writeMode(5000);
     extern StateManager currentState;
 
-    ButtonInstruction aButton("BtnAA.txt", &currentState.A);
-    ButtonInstruction bButton("BtnBB.txt", &currentState.B);
-    //ButtonInstruction xButton("BtnXX.txt", &currentState.X);
-    //ButtonInstruction yButton("BtnYY.txt", &currentState.Y);
+    std::vector<ButtonInstruction> buttons = {
+        ButtonInstruction(currentFileSet[8], &currentState.A, buttonA),
+        ButtonInstruction(currentFileSet[9], &currentState.B, buttonB),
+        ButtonInstruction(currentFileSet[10], &currentState.X, buttonX),
+        ButtonInstruction(currentFileSet[11], &currentState.Y, buttonY)
+    };
+    // ButtonInstruction aButton(currentFileSet[8], &currentState.A, buttonA);
+    // ButtonInstruction bButton(currentFileSet[9], &currentState.B, buttonB);
+    // ButtonInstruction xButton(currentFileSet[10], &currentState.X, buttonX);
+    // ButtonInstruction yButton(currentFileSet[11], &currentState.Y, buttonY);
 
     //ButtonInstruction upButton("BtnUp.txt", &currentState.Up);
     //ButtonInstruction downButton("BtnDn.txt", &currentState.Down);
@@ -190,8 +221,8 @@ int main() {
     Brain.resetTimer();
     Brain.Screen.clearScreen();
     while (true){
-        bButton.update(buttonB);
-        aButton.update(buttonA);
+        for (int i = 0; i < buttons.size(); i++)
+            buttons[i].update();
     }  
 
 }

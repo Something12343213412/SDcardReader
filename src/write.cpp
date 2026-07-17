@@ -1,5 +1,21 @@
 #include "write.h"
 
+char fileSet1[16][11] = 
+{   "1Axis1.txt", "1Axis2.txt", "1Axis3.txt", "1Axis4.txt", 
+    "1BtnUp.txt", "1BtnDn.txt", "1BtnRt.txt", "1BtnLt.txt",
+    "1BtnAA.txt", "1BtnBB.txt", "1BtnXX.txt", "1BtnYY.txt",
+    "1BtnL1.txt", "1BtnL2.txt", "1BtnR1.txt", "1BtnR2.txt"
+};
+
+char fileSet2[16][11] = 
+{   "2Axis1.txt", "2Axis2.txt", "2Axis3.txt", "2Axis4.txt", 
+    "2BtnUp.txt", "2BtnDn.txt", "2BtnRt.txt", "2BtnLt.txt",
+    "2BtnAA.txt", "2BtnBB.txt", "2BtnXX.txt", "2BtnYY.txt",
+    "2BtnL1.txt", "2BtnL2.txt", "2BtnR1.txt", "2BtnR2.txt"
+};
+
+char (*currentFileSet)[11] = fileSet1;
+
 // stolen from somewhere on stack overflow
 template <typename T>
 std::string to_string(T value)
@@ -25,67 +41,67 @@ void writeData(std::string file, int pos, float time){
 }
 
 void writeAxis1(){
-    writeData("Axis1.txt", Controller1.Axis1.position(percent), Brain.timer(msec));
+    writeData(to_string(currentFileSet[0]), Controller1.Axis1.position(percent), Brain.timer(msec));
 }
 
 void writeAxis2(){
-    writeData("Axis2.txt", Controller1.Axis2.position(percent), Brain.timer(msec));
+    writeData(to_string(currentFileSet[1]), Controller1.Axis2.position(percent), Brain.timer(msec));
 }
 
 void writeAxis3(){
-    writeData("Axis3.txt", Controller1.Axis3.position(percent), Brain.timer(msec));
+    writeData(to_string(currentFileSet[2]), Controller1.Axis3.position(percent), Brain.timer(msec));
 }
 
 void writeAxis4(){
-    writeData("Axis4.txt", Controller1.Axis4.position(percent), Brain.timer(msec));
+    writeData(to_string(currentFileSet[3]), Controller1.Axis4.position(percent), Brain.timer(msec));
 }
 
 void writeButtonUp(){
-    writeData("BtnUp.txt", Controller1.ButtonUp.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[4]), Controller1.ButtonUp.pressing(), Brain.timer(msec));
 }
 
 void writeButtonDown(){
-    writeData("BtnDn.txt", Controller1.ButtonDown.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[5]), Controller1.ButtonDown.pressing(), Brain.timer(msec));
 }
 
 void writeButtonRight(){
-    writeData("BtnRt.txt", Controller1.ButtonRight.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[6]), Controller1.ButtonRight.pressing(), Brain.timer(msec));
 }
 
 void writeButtonLeft(){
-    writeData("BtnLt.txt", Controller1.ButtonLeft.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[7]), Controller1.ButtonLeft.pressing(), Brain.timer(msec));
 }
 
 void writeButtonA(){
-    writeData("BtnAA.txt", Controller1.ButtonA.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[8]), Controller1.ButtonA.pressing(), Brain.timer(msec));
 }
 
 void writeButtonB(){
-    writeData("BtnBB.txt", Controller1.ButtonB.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[9]), Controller1.ButtonB.pressing(), Brain.timer(msec));
 }
 
 void writeButtonX(){
-    writeData("BtnXX.txt", Controller1.ButtonX.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[10]), Controller1.ButtonX.pressing(), Brain.timer(msec));
 }
 
 void writeButtonY(){
-    writeData("BtnYY.txt", Controller1.ButtonY.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[11]), Controller1.ButtonY.pressing(), Brain.timer(msec));
 }
 
 void writeButtonL1(){
-    writeData("BtnL1.txt", Controller1.ButtonL1.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[12]), Controller1.ButtonL1.pressing(), Brain.timer(msec));
 }
 
 void writeButtonL2(){
-    writeData("BtnL2.txt", Controller1.ButtonL2.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[13]), Controller1.ButtonL2.pressing(), Brain.timer(msec));
 }
 
 void writeButtonR1(){
-    writeData("BtnR1.txt", Controller1.ButtonR1.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[14]), Controller1.ButtonR1.pressing(), Brain.timer(msec));
 }
 
 void writeButtonR2(){
-    writeData("BtnR2.txt", Controller1.ButtonR2.pressing(), Brain.timer(msec));
+    writeData(to_string(currentFileSet[15]), Controller1.ButtonR2.pressing(), Brain.timer(msec));
 }
 
 void setWrites(){

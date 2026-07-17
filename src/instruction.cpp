@@ -38,7 +38,7 @@ void convertStringToInstruction(std::vector<Instruction>* result, char* string){
     std::reverse(result->begin(), result->end());
 }
 
-void ButtonInstruction::update(std::function<void ()> callback){
+void ButtonInstruction::update(){
     extern brain Brain;
     // if facing preformance issues could just create a local copy of last index of instructions so much less calls have to be made
 
@@ -53,13 +53,13 @@ void ButtonInstruction::update(std::function<void ()> callback){
         printf("\n Instruction time was %d",this->instructions[this->instructions.size()-1].time);
         printf("\n");
 
-        callback();
+        this->callback();
         // delete the instruction that was just read
         this->instructions.pop_back();
     }
 }
 
-ButtonInstruction::ButtonInstruction(char* fileName, bool* stateValue){
+ButtonInstruction::ButtonInstruction(char* fileName, bool* stateValue, std::function<void ()> callback){
     int fileSize = Brain.SDcard.size(fileName);
     uint8_t buffer[fileSize+1];
     buffer[fileSize] = '\0'; // adding end code
@@ -71,6 +71,7 @@ ButtonInstruction::ButtonInstruction(char* fileName, bool* stateValue){
     convertStringToInstruction(&this->instructions, charPointer);
     // this is not an ideal solution at all and idk really know why it is needed but w/o it update just skips over last index
     this->instructions.insert(this->instructions.begin(), Instruction(999999999,0));
+    this->callback = callback;
 }
 
 void ButtonInstruction::PrintInstruction(){
