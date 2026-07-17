@@ -1,8 +1,5 @@
 #include "instruction.h"
 
-// contains a list of Button Instructions that will later be looped through and updates called
-std::vector<ButtonInstruction*> buttonInstructions;
-
 Instruction::Instruction(int time, int power){
     this->time = time;
     this->power = power;
@@ -41,7 +38,7 @@ void convertStringToInstruction(std::vector<Instruction>* result, char* string){
     std::reverse(result->begin(), result->end());
 }
 
-void ButtonInstruction::update(std::function<void ()>){
+void ButtonInstruction::update(std::function<void ()> callback){
     extern brain Brain;
     // if facing preformance issues could just create a local copy of last index of instructions so much less calls have to be made
 
@@ -56,18 +53,24 @@ void ButtonInstruction::update(std::function<void ()>){
         printf("\n Instruction time was %d",this->instructions[this->instructions.size()-1].time);
         printf("\n");
 
+        callback();
         // delete the instruction that was just read
         this->instructions.pop_back();
     }
 }
 
-ButtonInstruction::ButtonInstruction(char* charPointer, bool* stateValue){
-    extern std::vector<ButtonInstruction*> buttonInstructions;
+ButtonInstruction::ButtonInstruction(char* fileName, bool* stateValue){
+    int fileSize = Brain.SDcard.size(fileName);
+    uint8_t buffer[fileSize+1];
+    buffer[fileSize] = '\0'; // adding end code
+
+    Brain.SDcard.loadfile(fileName, buffer, sizeof(buffer));
+    char* charPointer = (char*)buffer;
+
     this->stateValue = stateValue;
     convertStringToInstruction(&this->instructions, charPointer);
     // this is not an ideal solution at all and idk really know why it is needed but w/o it update just skips over last index
     this->instructions.insert(this->instructions.begin(), Instruction(999999999,0));
-    buttonInstructions.push_back(this);   
 }
 
 void ButtonInstruction::PrintInstruction(){

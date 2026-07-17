@@ -106,6 +106,9 @@ void setWrites(){
     Controller1.ButtonLeft.pressed(writeButtonLeft);
     Controller1.ButtonLeft.released(writeButtonLeft);
 
+    Controller1.ButtonA.pressed(writeButtonA);
+    Controller1.ButtonA.released(writeButtonA);
+
     Controller1.ButtonB.pressed(writeButtonB);
     Controller1.ButtonB.released(writeButtonB);
 

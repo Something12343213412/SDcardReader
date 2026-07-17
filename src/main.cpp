@@ -114,7 +114,8 @@ void logAll(){
     }
 }
 
-void writeMode(){
+void writeMode(int time){
+    Brain.resetTimer();
     uint8_t empty[0];
 
     for(int i = 0; i < sizeof(files)/10; i++){
@@ -123,9 +124,9 @@ void writeMode(){
 
     setWrites();
 
-    Controller1.ButtonA.pressed(logAll);
+    //Controller1.ButtonA.pressed(logAll);
 
-    while (true){
+    while (Brain.timer(msec) < time){
         updateInputs();
         printInputs(inputs);
         wait(10, msec);
@@ -143,43 +144,54 @@ void readFile(uint8_t* buffer, char* file){
 }
 
 
-void empty(){
+void buttonA(){
+    extern StateManager currentState;
+    if (currentState.A)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+
+    Brain.Screen.drawCircle(30,40,30);
+    Brain.Screen.printAt(20,50, "A");
 
 }
+
+void buttonB(){
+    extern StateManager currentState;
+    if (currentState.B)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+
+    Brain.Screen.drawCircle(30,100,30);
+    Brain.Screen.printAt(20,100, "B");
+}
+
 
 int main() {
     //writeMode();
 
-    
-    int fileSize = Brain.SDcard.size("BtnBB.txt");
-    uint8_t buffer[fileSize+1];
-    buffer[fileSize] = '\0'; // adding end code
-
-    Brain.SDcard.loadfile("BtnBB.txt", buffer, sizeof(buffer));
-    char* charPointer = (char*)buffer;
-
-    
-    /*
-    std::vector<Instruction> result;
-    //convertStringToInstruction(&result, charPointer);
-
-    for (int i = result.size()-1; i > -1; i--){
-        printf("%d", result[i].power);
-        printf("%s", " | ");
-        printf("%d", result[i].time);
-        printf("\n");
-    }
-    */
-
-    //printf("%s", buffer);
-    
-    
+    writeMode(5000);
     extern StateManager currentState;
-    ButtonInstruction result2(charPointer, &currentState.A);
-    result2.PrintInstruction();
+
+    ButtonInstruction aButton("BtnAA.txt", &currentState.A);
+    ButtonInstruction bButton("BtnBB.txt", &currentState.B);
+    //ButtonInstruction xButton("BtnXX.txt", &currentState.X);
+    //ButtonInstruction yButton("BtnYY.txt", &currentState.Y);
+
+    //ButtonInstruction upButton("BtnUp.txt", &currentState.Up);
+    //ButtonInstruction downButton("BtnDn.txt", &currentState.Down);
+    //ButtonInstruction rightButton("BtnRt.txt", &currentState.Right);
+    //ButtonInstruction leftButton("BtnLt.txt", &currentState.Left);
+
+
+
+    Brain.Screen.setPenColor("#000000");
     Brain.resetTimer();
+    Brain.Screen.clearScreen();
     while (true){
-        result2.update(empty);
+        bButton.update(buttonB);
+        aButton.update(buttonA);
     }  
 
 }

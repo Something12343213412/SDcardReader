@@ -26,8 +26,8 @@ class ButtonInstruction{
         std::vector<Instruction> instructions;
         // updates the global state, if did pops instruction then runs callback
         void update(std::function<void ()> callback);
-        // takes in a button and the data of a file and the state that it effects
-        ButtonInstruction(char* charPointer, bool* stateValue);
+        //takes in the name of a file and the state that it effects
+        ButtonInstruction(char* fileName, bool* stateValue);
         // used for debugging
         void PrintInstruction();
 };
