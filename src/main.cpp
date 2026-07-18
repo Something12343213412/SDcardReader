@@ -288,22 +288,21 @@ extern StateManager currentState;
 }
 
 void auton(){
-
     extern StateManager currentState;
     extern char (*currentFileSet)[11];
-    extern char (*fileSet1)[11];
-    extern char (*fileSet2)[11];
+    extern char fileSet1[16][11];
+    extern char fileSet2[16][11];
 
     // loading correct fileset
     if (Brain.SDcard.exists("CurrentState.txt")){
         uint8_t* buffer;
         int fileSize = Brain.SDcard.size("CurrentState.txt");
         buffer = new uint8_t[fileSize];
-        Brain.SDcard.loadfile("CurrentState.txt", buffer, sizeof(buffer));
-        //if ((char*)buffer == "1")
-            //currentFileSet = fileSet1;
-        //else
-            //currentFileSet = fileSet2;
+        Brain.SDcard.loadfile("CurrentState.txt", buffer, fileSize);
+        if (strcmp((char*)buffer, "1"))
+            currentFileSet = fileSet1;
+        else
+            currentFileSet = fileSet2;
 
 
     }
@@ -338,15 +337,7 @@ void auton(){
 }
 
 void driverControl(){
-    Brain.Screen.print("What File set? 1 or 2 \n hold left for 1, hold right for 2");
 
-    std::string dataStr = ("1");
-    size_t len = dataStr.size();
-
-    uint8_t data[len];
-    memcpy(data, dataStr.c_str(), len);
-    Brain.SDcard.appendfile("CurrentState.txt", data, len);
-    writeMode(5000);
 }
 
 
@@ -355,6 +346,85 @@ int main() {
 
     Competition.autonomous(auton);
     Competition.drivercontrol(driverControl);
+
+    // I think this works (to only run during no competition selection) as there is no 3 second window
+    if (Competition.isEnabled()){
+
+        Brain.Screen.print("Write to a file (A)");
+        Brain.Screen.newLine();
+        Brain.Screen.print("Run a file/set auton (B)");
+        Brain.Screen.newLine();
+        Brain.Screen.print("Driver Control (X)");
+
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print("Write to a file (A)");
+        Controller1.Screen.newLine();
+        Controller1.Screen.print("Run file/set auton (B)");
+        Controller1.Screen.newLine();
+        Controller1.Screen.print("Driver Control (X)");
+
+        // while none is pressed wait
+        while (!(Controller1.ButtonA.pressing() || Controller1.ButtonB.pressing() || Controller1.ButtonX.pressing())){
+            // wait
+        }
+        
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(1,1);
+
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+
+        if (Controller1.ButtonA.pressing()){       
+            // here so one A doesn't carry over to the next option
+            wait(200, msec);     
+            Brain.Screen.print("What File set? 1(A) or 2(B)");
+            Controller1.Screen.print("What File set?");
+            Controller1.Screen.newLine();
+            Controller1.Screen.print("1(A) or 2(B)");
+            while (!(Controller1.ButtonA.pressing() || Controller1.ButtonB.pressing())){
+                // wait
+            }
+            
+            extern char (*currentFileSet)[11];
+            extern char fileSet1[16][11];
+            extern char fileSet2[16][11];
+
+            if (Controller1.ButtonA.pressing())
+                currentFileSet = fileSet1;
+            else
+                currentFileSet = fileSet2;
+
+            Brain.resetTimer();
+            while (3000-Brain.timer(msec) > 0){
+                Brain.Screen.setCursor(1,1);
+                Brain.Screen.clearScreen();
+                Brain.Screen.print(3000-Brain.timer(msec));
+
+                Controller1.Screen.setCursor(1,1);
+                Controller1.Screen.clearScreen();
+                Controller1.Screen.print(3000-Brain.timer(msec));
+            }
+            
+            writeMode(15000);
+        }
+
+        else if(Controller1.ButtonB.pressing()){
+            wait(200, msec);
+            Brain.Screen.print("Run auton (A) or set auton file set (B)");
+
+            Controller1.Screen.print("Run auton (A)");
+            Controller1.Screen.newLine();
+            Controller1.Screen.print("set auton file (B)");
+        }
+        else if(Controller1.ButtonX.pressing()){
+            wait(200, msec);
+            driverControl();
+        }
+    }
+
+    
+    
 }
 
 
