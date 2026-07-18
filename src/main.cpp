@@ -134,16 +134,24 @@ void writeMode(int time){
     }
 }
 
-//returns pointer of readfile, make sure to make a copy of the pointer as this data is probably going to be deleted
-void readFile(uint8_t* buffer, char* file){
-    int fileSize = Brain.SDcard.size(file);
 
-    buffer = new uint8_t[fileSize+1];
-    buffer[fileSize] = '\0'; // adding end code
-
-    Brain.SDcard.loadfile(file, buffer, sizeof(buffer));
+void axis12(){
+    extern StateManager currentState;
+    Brain.Screen.drawRectangle(390,100,80,80,"#3d3737");
+    //Brain.Screen.drawCircle(40,40,40,"#3d3737");
+    int x = ((float)currentState.Axis1/100.0)*30 + 430;
+    int y = (-(float)currentState.Axis2/100.0)*30 + 140;
+    Brain.Screen.drawCircle(x,y,5,"#e9e2e2");
 }
 
+void axis34(){
+    extern StateManager currentState;
+    Brain.Screen.drawRectangle(0,100,80,80,"#3d3737");
+    //Brain.Screen.drawCircle(40,40,40,"#3d3737");
+    int x = ((float)currentState.Axis4/100.0)*30 + 40;
+    int y = (-(float)currentState.Axis3/100.0)*30 + 140;
+    Brain.Screen.drawCircle(x,y,5,"#e9e2e2");
+}
 
 void buttonA(){
     extern StateManager currentState;
@@ -152,8 +160,8 @@ void buttonA(){
     else
         Brain.Screen.setFillColor("#5c5c5c");
 
-    Brain.Screen.drawCircle(30,40,30);
-    Brain.Screen.printAt(20,50, "A");
+    Brain.Screen.drawCircle(380,190,15);
+    Brain.Screen.printAt(375,190, "A");
 
 }
 
@@ -164,8 +172,8 @@ void buttonB(){
     else
         Brain.Screen.setFillColor("#5c5c5c");
 
-    Brain.Screen.drawCircle(30,110,30);
-    Brain.Screen.printAt(20,110, "B");
+    Brain.Screen.drawCircle(360,210,15);
+    Brain.Screen.printAt(355,210, "B");
 }
 
 void buttonX(){
@@ -175,8 +183,8 @@ void buttonX(){
     else
         Brain.Screen.setFillColor("#5c5c5c");
 
-    Brain.Screen.drawCircle(70,40,30);
-    Brain.Screen.printAt(70,40, "X");
+    Brain.Screen.drawCircle(360,170,15);
+    Brain.Screen.printAt(355,170, "X");
 }
 
 void buttonY(){
@@ -186,36 +194,139 @@ void buttonY(){
     else
         Brain.Screen.setFillColor("#5c5c5c");
 
-    Brain.Screen.drawCircle(70,110,30);
-    Brain.Screen.printAt(70,110, "Y");
+    Brain.Screen.drawCircle(340,190,15);
+    Brain.Screen.printAt(335,190, "Y");
 }
 
-
-int main() {
-
-    extern char (*currentFileSet)[11];
-    //writeMode();
-
-    writeMode(5000);
+void buttonRight(){
     extern StateManager currentState;
+    if (currentState.Right)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+
+    Brain.Screen.drawCircle(100,190,15);
+    Brain.Screen.printAt(90,195, "Rt");
+
+}
+
+void buttonDown(){
+    extern StateManager currentState;
+    if (currentState.Down)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+
+    Brain.Screen.drawCircle(120,210,15);
+    Brain.Screen.printAt(110,215, "Dn");
+}
+
+void buttonUp(){
+    extern StateManager currentState;
+    if (currentState.Up)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+
+    Brain.Screen.drawCircle(120,170,15);
+    Brain.Screen.printAt(110,175, "Up");
+}
+
+void buttonLeft(){
+    extern StateManager currentState;
+    if (currentState.Left)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+
+    Brain.Screen.drawCircle(140,190,15);
+    Brain.Screen.printAt(130,195, "Lt");
+}
+
+void buttonL1(){
+    extern StateManager currentState;
+    if (currentState.L1)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+    
+    Brain.Screen.drawRectangle(5,5,100,35);
+    Brain.Screen.printAt(45,30, "L1");
+}
+
+void buttonL2(){
+extern StateManager currentState;
+    if (currentState.L2)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+    
+    Brain.Screen.drawRectangle(5,45,100,35);
+    Brain.Screen.printAt(45,70, "L2");
+}
+
+void buttonR1(){
+    extern StateManager currentState;
+    if (currentState.R1)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+    
+    Brain.Screen.drawRectangle(375,5,100,35);
+    Brain.Screen.printAt(415,30, "R1");
+}
+
+void buttonR2(){
+extern StateManager currentState;
+    if (currentState.R2)
+        Brain.Screen.setFillColor("#00c434");
+    else
+        Brain.Screen.setFillColor("#5c5c5c");
+    
+    Brain.Screen.drawRectangle(375,45,100,35);
+    Brain.Screen.printAt(415,70, "R2");
+}
+
+void auton(){
+
+    extern StateManager currentState;
+    extern char (*currentFileSet)[11];
+    extern char (*fileSet1)[11];
+    extern char (*fileSet2)[11];
+
+    // loading correct fileset
+    if (Brain.SDcard.exists("CurrentState.txt")){
+        uint8_t* buffer;
+        int fileSize = Brain.SDcard.size("CurrentState.txt");
+        buffer = new uint8_t[fileSize];
+        Brain.SDcard.loadfile("CurrentState.txt", buffer, sizeof(buffer));
+        //if ((char*)buffer == "1")
+            //currentFileSet = fileSet1;
+        //else
+            //currentFileSet = fileSet2;
+
+
+    }
+
 
     std::vector<ButtonInstruction> buttons = {
+        ButtonInstruction(currentFileSet[0], &currentState.Axis1, axis12),
+        ButtonInstruction(currentFileSet[1], &currentState.Axis2, axis12),
+        ButtonInstruction(currentFileSet[2], &currentState.Axis3, axis34),
+        ButtonInstruction(currentFileSet[3], &currentState.Axis4, axis34),
+        ButtonInstruction(currentFileSet[4], &currentState.Up, buttonUp),
+        ButtonInstruction(currentFileSet[5], &currentState.Down, buttonDown),
+        ButtonInstruction(currentFileSet[6], &currentState.Right, buttonRight),
+        ButtonInstruction(currentFileSet[7], &currentState.Left, buttonLeft),
         ButtonInstruction(currentFileSet[8], &currentState.A, buttonA),
         ButtonInstruction(currentFileSet[9], &currentState.B, buttonB),
         ButtonInstruction(currentFileSet[10], &currentState.X, buttonX),
-        ButtonInstruction(currentFileSet[11], &currentState.Y, buttonY)
+        ButtonInstruction(currentFileSet[11], &currentState.Y, buttonY),
+        ButtonInstruction(currentFileSet[12], &currentState.L1, buttonL1),
+        ButtonInstruction(currentFileSet[13], &currentState.L2, buttonL2),
+        ButtonInstruction(currentFileSet[12], &currentState.R1, buttonR1),
+        ButtonInstruction(currentFileSet[13], &currentState.R2, buttonR2)
     };
-    // ButtonInstruction aButton(currentFileSet[8], &currentState.A, buttonA);
-    // ButtonInstruction bButton(currentFileSet[9], &currentState.B, buttonB);
-    // ButtonInstruction xButton(currentFileSet[10], &currentState.X, buttonX);
-    // ButtonInstruction yButton(currentFileSet[11], &currentState.Y, buttonY);
-
-    //ButtonInstruction upButton("BtnUp.txt", &currentState.Up);
-    //ButtonInstruction downButton("BtnDn.txt", &currentState.Down);
-    //ButtonInstruction rightButton("BtnRt.txt", &currentState.Right);
-    //ButtonInstruction leftButton("BtnLt.txt", &currentState.Left);
-
-
 
     Brain.Screen.setPenColor("#000000");
     Brain.resetTimer();
@@ -224,7 +335,26 @@ int main() {
         for (int i = 0; i < buttons.size(); i++)
             buttons[i].update();
     }  
+}
 
+void driverControl(){
+    Brain.Screen.print("What File set? 1 or 2 \n hold left for 1, hold right for 2");
+
+    std::string dataStr = ("1");
+    size_t len = dataStr.size();
+
+    uint8_t data[len];
+    memcpy(data, dataStr.c_str(), len);
+    Brain.SDcard.appendfile("CurrentState.txt", data, len);
+    writeMode(5000);
+}
+
+
+int main() {
+    competition Competition;
+
+    Competition.autonomous(auton);
+    Competition.drivercontrol(driverControl);
 }
 
 

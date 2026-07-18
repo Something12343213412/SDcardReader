@@ -1,5 +1,7 @@
 #include "write.h"
 
+extern brain Brain;
+
 char fileSet1[16][11] = 
 {   "1Axis1.txt", "1Axis2.txt", "1Axis3.txt", "1Axis4.txt", 
     "1BtnUp.txt", "1BtnDn.txt", "1BtnRt.txt", "1BtnLt.txt",
@@ -13,6 +15,7 @@ char fileSet2[16][11] =
     "2BtnAA.txt", "2BtnBB.txt", "2BtnXX.txt", "2BtnYY.txt",
     "2BtnL1.txt", "2BtnL2.txt", "2BtnR1.txt", "2BtnR2.txt"
 };
+
 
 char (*currentFileSet)[11] = fileSet1;
 

@@ -43,15 +43,18 @@ void ButtonInstruction::update(){
     // if facing preformance issues could just create a local copy of last index of instructions so much less calls have to be made
 
     // checks if the current time is past or = to the time in instructions
+    
     if((int)Brain.timer(msec) >= this->instructions[this->instructions.size()-1].time){
         // set the current state value to be the last thing instructions
-        *this->stateValue = (bool)this->instructions[this->instructions.size()-1].power;
+        *this->stateValue = this->instructions[this->instructions.size()-1].power;
             
         // debug statements, idk how to use printf, don't judge me
-        printf("Current state is %d", (bool)this->instructions[this->instructions.size()-1].power);
+        /*
+        printf("Current state is %d", this->instructions[this->instructions.size()-1].power);
         printf("\n Current time is %f", Brain.timer(msec));
         printf("\n Instruction time was %d",this->instructions[this->instructions.size()-1].time);
         printf("\n");
+        */
 
         this->callback();
         // delete the instruction that was just read
@@ -59,7 +62,7 @@ void ButtonInstruction::update(){
     }
 }
 
-ButtonInstruction::ButtonInstruction(char* fileName, bool* stateValue, std::function<void ()> callback){
+ButtonInstruction::ButtonInstruction(char* fileName, short* stateValue, std::function<void ()> callback){
     int fileSize = Brain.SDcard.size(fileName);
     uint8_t buffer[fileSize+1];
     buffer[fileSize] = '\0'; // adding end code
@@ -68,9 +71,11 @@ ButtonInstruction::ButtonInstruction(char* fileName, bool* stateValue, std::func
     char* charPointer = (char*)buffer;
 
     this->stateValue = stateValue;
+    //printf("%d \n", this->instructions.max_size());
     convertStringToInstruction(&this->instructions, charPointer);
     // this is not an ideal solution at all and idk really know why it is needed but w/o it update just skips over last index
     this->instructions.insert(this->instructions.begin(), Instruction(999999999,0));
+    //this->instructions.insert(this->instructions.end(), Instruction(999999999,0));
     this->callback = callback;
 }
 
