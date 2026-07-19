@@ -297,9 +297,12 @@ void auton(){
     if (Brain.SDcard.exists("CurrentState.txt")){
         uint8_t* buffer;
         int fileSize = Brain.SDcard.size("CurrentState.txt");
-        buffer = new uint8_t[fileSize];
+        buffer = new uint8_t[fileSize+1];
         Brain.SDcard.loadfile("CurrentState.txt", buffer, fileSize);
-        if (strcmp((char*)buffer, "1"))
+        buffer[fileSize] = '\0';
+        printf("%s", buffer);
+        printf("\n");
+        if (!strcmp((char*)buffer, "1"))
             currentFileSet = fileSet1;
         else
             currentFileSet = fileSet2;
@@ -330,7 +333,8 @@ void auton(){
     Brain.Screen.setPenColor("#000000");
     Brain.resetTimer();
     Brain.Screen.clearScreen();
-    while (true){
+    // can change the time, defauly is just 15 seconds though
+    while (Brain.timer(msec) < 15000){
         for (int i = 0; i < buttons.size(); i++)
             buttons[i].update();
     }  
@@ -347,8 +351,16 @@ int main() {
     Competition.autonomous(auton);
     Competition.drivercontrol(driverControl);
 
+    Brain.Screen.setFillColor("#000000");
+    Brain.Screen.setPenColor("#ffffff");
+
     // I think this works (to only run during no competition selection) as there is no 3 second window
     if (Competition.isEnabled()){
+
+        Controller1.Screen.clearScreen();
+        Brain.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Brain.Screen.setCursor(1,1);
 
         Brain.Screen.print("Write to a file (A)");
         Brain.Screen.newLine();
@@ -416,6 +428,53 @@ int main() {
             Controller1.Screen.print("Run auton (A)");
             Controller1.Screen.newLine();
             Controller1.Screen.print("set auton file (B)");
+
+            while (!(Controller1.ButtonA.pressing() || Controller1.ButtonB.pressing())){
+                // wait
+            }
+
+            Controller1.Screen.clearScreen();
+            Brain.Screen.clearScreen();
+            Controller1.Screen.setCursor(1,1);
+            Brain.Screen.setCursor(1,1);
+
+            if (Controller1.ButtonA.pressing())
+                auton();
+            else{
+                wait(200, msec);
+                
+                Brain.Screen.print("File set A(A) or B(B)");
+                Controller1.Screen.print("File set A(A) or B(B)");
+
+                while (!(Controller1.ButtonA.pressing() || Controller1.ButtonB.pressing())){
+                // wait
+                }
+
+                Controller1.Screen.clearScreen();
+                Brain.Screen.clearScreen();
+                Controller1.Screen.setCursor(1,1);
+                Brain.Screen.setCursor(1,1);
+                    
+                if(Controller1.ButtonA.pressing()){
+                    uint8_t data[2];
+                    memcpy(data, "1\0", 2);
+                    Brain.SDcard.savefile("CurrentState.txt", data, 1);
+                    Brain.Screen.print("File set 1 selected");
+                    Controller1.Screen.print("File set 1 selected");
+                }
+                else{
+                    uint8_t data[2];
+                    memcpy(data, "2\0", 2);
+                    Brain.SDcard.savefile("CurrentState.txt", data, 2);
+                    Brain.Screen.print("File set 2 selected");
+                    Controller1.Screen.print("File set 2 selected");
+                }
+                wait(1000, msec);
+
+
+            }
+                
+
         }
         else if(Controller1.ButtonX.pressing()){
             wait(200, msec);
