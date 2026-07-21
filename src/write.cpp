@@ -16,6 +16,54 @@ char fileSet2[16][11] =
     "2BtnL1.txt", "2BtnL2.txt", "2BtnR1.txt", "2BtnR2.txt"
 };
 
+TimePowerHolder::TimePowerHolder(int time, unsigned short power){
+    this->power = power;
+    this->time = time;
+}
+
+FileInformationHolder::FileInformationHolder(char* fileName, controller::button* linkedButton){
+    this->fileName = fileName;
+    this->linkedButton = linkedButton;
+}
+
+FileInformationHolder::FileInformationHolder(char* fileName, controller::axis* linkedAxis){
+    this->fileName = fileName;
+    this->linkedAxis = linkedAxis;
+}
+
+void FileInformationHolder::update(){
+    // checking if there is a linked button, if so run button code
+    if (this->linkedButton != nullptr)
+        this->information.push_back(TimePowerHolder((int)Brain.timer(msec), this->linkedButton->pressing()));
+    else if (this->linkedAxis != nullptr)
+        this->information.push_back(TimePowerHolder((int)Brain.timer(msec), this->linkedAxis->position(percent)));
+    else
+        printf("No button or axis is linked \n");
+}
+
+uint8_t* FileInformationHolder::toUint8_tString(){
+    // error handling
+    if (this->information.size() == 0 ){
+        printf("empty string \n");
+        return uint8_t();
+    }
+
+    // define a c-string that can just later memcopy, I'm not famaliar enough with uint8_t to just do stuff with them directly
+    std::string container = "";
+    for(auto a : this->information){
+        // if issues arise may be coming from this
+        container += (a.power + "|" + a.time + ',');
+    }
+
+    // finding size of the container
+    size_t len = container.size();
+    uint8_t data[len+2];
+    // adding end code, not sure how I would do this in one line, also probably more effective way to do this
+    data[len] = uint8_t(255);
+    data[len] = uint8_t("|");
+    return data;
+}
+
 
 char (*currentFileSet)[11] = fileSet1;
 

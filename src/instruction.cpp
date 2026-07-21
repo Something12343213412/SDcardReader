@@ -18,20 +18,23 @@ void convertStringToInstruction(std::vector<Instruction>* result, char* string){
     {
         // store value then repeat
         val1 = atoi(pch);
-        pch = strtok (NULL, "|,");
-        val2 = atoi(pch);
-        // want to make sure not doing a null ptr
-        if(pch!=NULL)
+        // checking for end code
+        if (val1 != 255){
             pch = strtok (NULL, "|,");
+            val2 = atoi(pch);
+            // want to make sure not doing a null ptr
+            if(pch!=NULL)
+                pch = strtok (NULL, "|,");
 
-        /*
-        // debug statements
-        printf("val 1 is %d", val1);
-        printf("\n val 2 is %d", val2);
-        printf("\n");
-        */
-        // add the values to a vector that houses the instructions
-        result->push_back(Instruction(val2, val1));   
+            /*
+            // debug statements
+            printf("val 1 is %d", val1);
+            printf("\n val 2 is %d", val2);
+            printf("\n");
+            */
+            // add the values to a vector that houses the instructions
+            result->push_back(Instruction(val2, val1));   
+        }
     }
     
     // adds it in reverse (if we start by indexing the array with using .size) so reversing it ahead of time
