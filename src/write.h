@@ -36,16 +36,16 @@ class FileInformationHolder{
         // same thing but instead for an axis
         controller::axis* linkedAxis = nullptr;
 
-        // converts vector to string that allows it to be easily written to a file
-        uint8_t* toUint8_tString();
+        // takes an input uint8_t pointer then assigns it a text output of the information vector
+        void toUint8_tString(uint8_t* inputString);
         // writes to the file given, call when timer is finished
         void writeToFile();
         // adds an index to the vector based on whether a button or axis is linked and the value of that
         void update();
         // button constructor
-        FileInformationHolder(char* fileName, controller::button* linkedButton);
+        FileInformationHolder(char* fileName, controller::button linkedButton);
         // axis constructor
-        FileInformationHolder(char* fileName, controller::axis* linkedAxis);
+        FileInformationHolder(char* fileName, controller::axis linkedAxis);
 };
 
 

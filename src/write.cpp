@@ -21,14 +21,14 @@ TimePowerHolder::TimePowerHolder(int time, unsigned short power){
     this->time = time;
 }
 
-FileInformationHolder::FileInformationHolder(char* fileName, controller::button* linkedButton){
+FileInformationHolder::FileInformationHolder(char* fileName, controller::button linkedButton){
     this->fileName = fileName;
-    this->linkedButton = linkedButton;
+    this->linkedButton = &linkedButton;
 }
 
-FileInformationHolder::FileInformationHolder(char* fileName, controller::axis* linkedAxis){
+FileInformationHolder::FileInformationHolder(char* fileName, controller::axis linkedAxis){
     this->fileName = fileName;
-    this->linkedAxis = linkedAxis;
+    this->linkedAxis = &linkedAxis;
 }
 
 void FileInformationHolder::update(){
@@ -41,28 +41,40 @@ void FileInformationHolder::update(){
         printf("No button or axis is linked \n");
 }
 
-uint8_t* FileInformationHolder::toUint8_tString(){
+void FileInformationHolder::toUint8_tString(uint8_t* inputString){
     // error handling
     if (this->information.size() == 0 ){
         printf("empty string \n");
-        return uint8_t();
+        return ;
     }
 
     // define a c-string that can just later memcopy, I'm not famaliar enough with uint8_t to just do stuff with them directly
     std::string container = "";
     for(auto a : this->information){
-        // if issues arise may be coming from this
-        container += (a.power + "|" + a.time + ',');
+        // I don't want to hear abt this, I'm doing this at night
+        container.append(to_string(a.power));
+        container.append("|");
+        container.append(to_string(a.time));
+        container.append(",");
     }
 
     // finding size of the container
     size_t len = container.size();
-    uint8_t data[len+2];
+    // making it a new pointer, watch out, it may cause issues
+    inputString = new uint8_t[len+2];
+    memcpy(inputString, container.c_str(), len);
     // adding end code, not sure how I would do this in one line, also probably more effective way to do this
-    data[len] = uint8_t(255);
-    data[len] = uint8_t("|");
-    return data;
+    inputString[len] = uint8_t(255);
+    inputString[len] = uint8_t('|');
 }
+
+void FileInformationHolder::writeToFile(){
+    uint8_t* data;
+    this->toUint8_tString(data);
+    // sizeof may be wrong thing to call here
+    Brain.SDcard.appendfile(this->fileName, data, sizeof(data));
+}
+
 
 
 char (*currentFileSet)[11] = fileSet1;
@@ -156,6 +168,10 @@ void writeButtonR2(){
 }
 
 void setWrites(){
+    extern char (*currentFileSet)[11];
+
+    FileInformationHolder Axis1(currentFileSet[0], Controller1.Axis1);
+    /*
     Controller1.Axis1.changed(writeAxis1);
     Controller1.Axis2.changed(writeAxis2);
     Controller1.Axis3.changed(writeAxis3);
@@ -196,4 +212,5 @@ void setWrites(){
 
     Controller1.ButtonR2.pressed(writeButtonR2);
     Controller1.ButtonR2.released(writeButtonR2);
+    */
 }
