@@ -31,6 +31,8 @@ class ButtonInstruction{
         // used for debugging
         void PrintInstruction();
         std::function<void ()> callback;
+
+        void flipInstruction();
         
 };
 

@@ -87,3 +87,29 @@ void ButtonInstruction::PrintInstruction(){
         printf("\n");
     }
 }
+
+
+void ButtonInstruction::flipInstruction(){
+    extern StateManager currentState;
+
+    std::vector<Instruction> localInstructions;
+
+    // -2 is there for the ending instruction
+    for (int i = this->instructions.size()-2; i > -1; i--){
+        if (this->stateValue == &currentState.Axis1 || this->stateValue == &currentState.Axis2 || this->stateValue == &currentState.Axis3 || this->stateValue == &currentState.Axis4){
+            localInstructions.push_back(Instruction(15000 - this->instructions[i].time, this->instructions[i].power*-1));
+            printf("time is %d \n", this->instructions[i].time);
+            printf("time is %d \n", 15000 - this->instructions[i].time);
+            printf("power is %d \n", this->instructions[i].power);
+            printf("power is %d \n", this->instructions[i].power*-1);
+
+        }
+        else{
+            
+            localInstructions.push_back(Instruction(15000 - this->instructions[i].time, this->instructions[i].power == 0));
+            printf("Button Input ran \n");
+        }
+    }
+    localInstructions.push_back(Instruction(1500000000, 0));
+    this->instructions = localInstructions;
+}

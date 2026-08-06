@@ -8,6 +8,18 @@
 /*----------------------------------------------------------------------------*/
 #include "instruction.h"
 
+// Robot configuration code.
+motor rightDTMotorA = motor(PORT11, ratio18_1, false);
+motor rightDTMotorB = motor(PORT12, ratio18_1, false);
+
+motor_group rightDT = motor_group(rightDTMotorA, rightDTMotorB);
+
+motor leftDTMotorA = motor(PORT19, ratio18_1, false);
+motor leftDTMotorB = motor(PORT20, ratio18_1, false);
+motor_group leftDT = motor_group(leftDTMotorA, leftDTMotorB);
+
+double powerMult = 1;
+
 // list of files, make sure they line up with the list in log all
 char files[][10] = 
 {   "Axis1.txt", "Axis2.txt", "Axis3.txt", "Axis4.txt", 
@@ -23,6 +35,9 @@ char files_2[][10] =
     "BtnAA", "BtnBB", "BtnXX", "BtnYY",
     "BtnL1", "BtnL2", "BtnR1", "BtnR2"
 };
+
+// tracks if auton is currently running, used in each callback
+bool autonRunning = false;
 
 // each index represents the value of a stick
 std::array<int, 16> inputs = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -115,6 +130,9 @@ void logAll(){
 }
 
 void writeMode(int time){
+    //extern double powerMult;
+    //powerMult = .7;
+
     Brain.resetTimer();
     uint8_t empty[0];
     extern char (*currentFileSet)[11];
@@ -128,6 +146,9 @@ void writeMode(int time){
     //Controller1.ButtonA.pressed(logAll);
 
     while (Brain.timer(msec) < time){
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print(Brain.timer(msec) - time);
         updateInputs();
         printInputs(inputs);
         wait(10, msec);
@@ -135,7 +156,55 @@ void writeMode(int time){
 }
 
 
+void updateAxis(){
+    extern StateManager currentState;
+
+    int x = -currentState.Axis1;
+    int y = currentState.Axis2;
+    
+
+    double leftVolts = -y;
+    double rightVolts = y;
+  
+    if (y<0) {
+        //x *= -1;
+    }
+    if (x >= 0) {
+        leftVolts = leftVolts - x;
+        rightVolts = rightVolts - x;
+    } else {
+        rightVolts = rightVolts - x;
+        leftVolts = leftVolts - x;
+    }
+
+    if (abs(rightVolts) < 5){
+        rightDT.stop();
+        rightVolts = 0;
+    }
+    if (abs(leftVolts) < 5){
+        leftDT.stop();
+        leftVolts = 0;
+    }
+    
+    rightVolts *= powerMult;
+    leftVolts *= powerMult;
+
+    rightDT.spin(forward, rightVolts, vex::velocityUnits::pct);
+    leftDT.spin(forward, leftVolts, vex::velocityUnits::pct);
+    
+    //backLeft1.spin(forward, leftVolts, vex::voltageUnits::volt);
+    //backLeft2.spin(forward, leftVolts, vex::voltageUnits::volt);
+}
+
 void axis12(){
+    extern bool autonRunning;
+    extern StateManager currentState;
+    if(!autonRunning){
+        currentState.Axis1 = Controller1.Axis1.position(percent);
+        currentState.Axis2 = Controller1.Axis2.position(percent);
+    }
+    updateAxis();
+
     extern StateManager currentState;
     Brain.Screen.drawRectangle(390,100,80,80,"#3d3737");
     //Brain.Screen.drawCircle(40,40,40,"#3d3737");
@@ -146,6 +215,12 @@ void axis12(){
 
 void axis34(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.Axis3 = Controller1.Axis3.position(percent);
+        currentState.Axis4 = Controller1.Axis4.position(percent);
+    }
+    updateAxis();
+    extern StateManager currentState;
     Brain.Screen.drawRectangle(0,100,80,80,"#3d3737");
     //Brain.Screen.drawCircle(40,40,40,"#3d3737");
     int x = ((float)currentState.Axis4/100.0)*30 + 40;
@@ -155,6 +230,9 @@ void axis34(){
 
 void buttonA(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.A = Controller1.ButtonA.pressing();
+    }
     if (currentState.A)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -167,6 +245,9 @@ void buttonA(){
 
 void buttonB(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.B = Controller1.ButtonB.pressing();
+    }
     if (currentState.B)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -178,6 +259,9 @@ void buttonB(){
 
 void buttonX(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.X = Controller1.ButtonX.pressing();
+    }
     if (currentState.X)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -189,6 +273,9 @@ void buttonX(){
 
 void buttonY(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.Y = Controller1.ButtonY.pressing();
+    }
     if (currentState.Y)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -200,6 +287,9 @@ void buttonY(){
 
 void buttonRight(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.Right = Controller1.ButtonRight.pressing();
+    }
     if (currentState.Right)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -212,6 +302,9 @@ void buttonRight(){
 
 void buttonDown(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.Down = Controller1.ButtonDown.pressing();
+    }
     if (currentState.Down)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -223,6 +316,9 @@ void buttonDown(){
 
 void buttonUp(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.Up = Controller1.ButtonUp.pressing();
+    }
     if (currentState.Up)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -234,6 +330,9 @@ void buttonUp(){
 
 void buttonLeft(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.Left = Controller1.ButtonLeft.pressing();
+    }
     if (currentState.Left)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -245,6 +344,9 @@ void buttonLeft(){
 
 void buttonL1(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.L1 = Controller1.ButtonL1.pressing();
+    }
     if (currentState.L1)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -255,7 +357,10 @@ void buttonL1(){
 }
 
 void buttonL2(){
-extern StateManager currentState;
+    extern StateManager currentState;
+    if(!autonRunning){
+        currentState.L2 = Controller1.ButtonL2.pressing();
+    }
     if (currentState.L2)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -267,6 +372,9 @@ extern StateManager currentState;
 
 void buttonR1(){
     extern StateManager currentState;
+    if(!autonRunning){
+        currentState.R1 = Controller1.ButtonR1.pressing();
+    }
     if (currentState.R1)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -277,7 +385,10 @@ void buttonR1(){
 }
 
 void buttonR2(){
-extern StateManager currentState;
+    extern StateManager currentState;
+    if(!autonRunning){
+        currentState.R2 = Controller1.ButtonR2.pressing();
+    }
     if (currentState.R2)
         Brain.Screen.setFillColor("#00c434");
     else
@@ -287,16 +398,26 @@ extern StateManager currentState;
     Brain.Screen.printAt(415,70, "R2");
 }
 
+
+bool normalRun = false;
+
 void auton(){
+    extern bool autonRunning;
     extern StateManager currentState;
     extern char (*currentFileSet)[11];
     extern char fileSet1[16][11];
     extern char fileSet2[16][11];
 
+    //extern double powerMult;
+    //powerMult =.7;
+
+    autonRunning = true;
+
     // loading correct fileset
     if (Brain.SDcard.exists("CurrentState.txt")){
         uint8_t* buffer;
         int fileSize = Brain.SDcard.size("CurrentState.txt");
+        printf("test \n");
         buffer = new uint8_t[fileSize+1];
         Brain.SDcard.loadfile("CurrentState.txt", buffer, fileSize);
         buffer[fileSize] = '\0';
@@ -306,7 +427,7 @@ void auton(){
             currentFileSet = fileSet1;
         else
             currentFileSet = fileSet2;
-
+        printf("test \n");
 
     }
 
@@ -338,25 +459,98 @@ void auton(){
         for (int i = 0; i < buttons.size(); i++)
             buttons[i].update();
     }  
+
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1,1);
+    Controller1.Screen.print(rightDT.position(rotationUnits::rev));
+    Controller1.Screen.newLine();
+    Controller1.Screen.print(leftDT.position(rotationUnits::rev));
+
+
+    while (!Controller1.ButtonL1.pressing()){
+        leftDT.stop();
+        rightDT.stop();
+    }
+
+    /*
+
+    std::vector<ButtonInstruction> newButtons = {
+        ButtonInstruction(currentFileSet[0], &currentState.Axis1, axis12),
+        ButtonInstruction(currentFileSet[1], &currentState.Axis2, axis12),
+        ButtonInstruction(currentFileSet[2], &currentState.Axis3, axis34),
+        ButtonInstruction(currentFileSet[3], &currentState.Axis4, axis34),
+        ButtonInstruction(currentFileSet[4], &currentState.Up, buttonUp),
+        ButtonInstruction(currentFileSet[5], &currentState.Down, buttonDown),
+        ButtonInstruction(currentFileSet[6], &currentState.Right, buttonRight),
+        ButtonInstruction(currentFileSet[7], &currentState.Left, buttonLeft),
+        ButtonInstruction(currentFileSet[8], &currentState.A, buttonA),
+        ButtonInstruction(currentFileSet[9], &currentState.B, buttonB),
+        ButtonInstruction(currentFileSet[10], &currentState.X, buttonX),
+        ButtonInstruction(currentFileSet[11], &currentState.Y, buttonY),
+        ButtonInstruction(currentFileSet[12], &currentState.L1, buttonL1),
+        ButtonInstruction(currentFileSet[13], &currentState.L2, buttonL2),
+        ButtonInstruction(currentFileSet[12], &currentState.R1, buttonR1),
+        ButtonInstruction(currentFileSet[13], &currentState.R2, buttonR2)
+    };
+
+    for (int i = newButtons.size()-1; i>-1; i--){
+        newButtons[i].flipInstruction();
+    }
+
+    Brain.resetTimer();
+    while (Brain.timer(msec) < 15000){
+        for (int i = 0; i < buttons.size(); i++)
+            buttons[i].update();
+    }  
+    */
 }
+
+competition Competition;
 
 void driverControl(){
-
+    if (!autonRunning){
+        Controller1.Axis1.changed(axis12);
+        Controller1.Axis2.changed(axis12);
+        Controller1.Axis3.changed(axis34);
+        Controller1.Axis4.changed(axis34);
+        Controller1.ButtonA.pressed(buttonA);
+        Controller1.ButtonB.pressed(buttonB);
+        Controller1.ButtonX.pressed(buttonX);
+        Controller1.ButtonY.pressed(buttonY);
+        Controller1.ButtonUp.pressed(buttonUp);
+        Controller1.ButtonDown.pressed(buttonDown);
+        Controller1.ButtonRight.pressed(buttonRight);
+        Controller1.ButtonLeft.pressed(buttonLeft);
+        Controller1.ButtonR1.pressed(buttonR1);
+        Controller1.ButtonR2.pressed(buttonR2);
+        Controller1.ButtonL1.pressed(buttonL1);
+        Controller1.ButtonL2.pressed(buttonL2);
+        Controller1.ButtonA.released(buttonA);
+        Controller1.ButtonB.released(buttonB);
+        Controller1.ButtonX.released(buttonX);
+        Controller1.ButtonY.released(buttonY);
+        Controller1.ButtonUp.released(buttonUp);
+        Controller1.ButtonDown.released(buttonDown);
+        Controller1.ButtonRight.released(buttonRight);
+        Controller1.ButtonLeft.released(buttonLeft);
+        Controller1.ButtonR1.released(buttonR1);
+        Controller1.ButtonR2.released(buttonR2);
+        Controller1.ButtonL1.released(buttonL1);
+        Controller1.ButtonL2.released(buttonL2);
+    }
 }
 
-
 int main() {
-    competition Competition;
-
-    Competition.autonomous(auton);
-    Competition.drivercontrol(driverControl);
-
+    rightDT.setStopping(brake);
+    leftDT.setStopping(brake);
+    extern bool normalRun;
+    
     Brain.Screen.setFillColor("#000000");
-    Brain.Screen.setPenColor("#ffffff");
+    //Brain.Screen.setPenColor("#ffffff");
 
     // I think this works (to only run during no competition selection) as there is no 3 second window
     if (Competition.isEnabled()){
-
+        normalRun = true;
         Controller1.Screen.clearScreen();
         Brain.Screen.clearScreen();
         Controller1.Screen.setCursor(1,1);
@@ -417,7 +611,7 @@ int main() {
                 Controller1.Screen.clearScreen();
                 Controller1.Screen.print(3000-Brain.timer(msec));
             }
-            
+            driverControl();
             writeMode(15000);
         }
 
@@ -481,6 +675,10 @@ int main() {
             driverControl();
         }
     }
+
+    Competition.autonomous(auton);
+    Competition.drivercontrol(driverControl);
+    
 
     
     
