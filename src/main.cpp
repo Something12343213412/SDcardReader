@@ -9,13 +9,13 @@
 #include "instruction.h"
 
 // Robot configuration code.
-motor rightDTMotorA = motor(PORT11, ratio18_1, false);
-motor rightDTMotorB = motor(PORT12, ratio18_1, false);
+motor rightDTMotorA = motor(PORT9, ratio18_1, false);
+motor rightDTMotorB = motor(PORT10, ratio18_1, false);
 
 motor_group rightDT = motor_group(rightDTMotorA, rightDTMotorB);
 
-motor leftDTMotorA = motor(PORT19, ratio18_1, false);
-motor leftDTMotorB = motor(PORT20, ratio18_1, false);
+motor leftDTMotorA = motor(PORT11, ratio18_1, false);
+motor leftDTMotorB = motor(PORT12, ratio18_1, false);
 motor_group leftDT = motor_group(leftDTMotorA, leftDTMotorB);
 
 double powerMult = 1;
@@ -544,6 +544,9 @@ int main() {
     rightDT.setStopping(brake);
     leftDT.setStopping(brake);
     extern bool normalRun;
+
+    Competition.autonomous(auton);
+    Competition.drivercontrol(driverControl);
     
     Brain.Screen.setFillColor("#000000");
     //Brain.Screen.setPenColor("#ffffff");
@@ -676,8 +679,7 @@ int main() {
         }
     }
 
-    Competition.autonomous(auton);
-    Competition.drivercontrol(driverControl);
+    
     
 
     
